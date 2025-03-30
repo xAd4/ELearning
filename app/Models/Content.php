@@ -5,23 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Section extends Model
+class Content extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "course_id",
+        "section_id",
         "title",
+        "file_path", // pdf, .zip, mp4
         "order",
     ];
 
-    public function course()
+    public function section()
     {
-        return $this->belongsTo(Course::class);
-    }
-
-    public function content()
-    {
-        return $this->hasMany(Content::class);
+        return $this->belongsTo(Section::class);
     }
 }

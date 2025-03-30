@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CoursesPaid extends Model
+class Response extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         "user_id",
-        "amount_total",
-        "payment_method",
-        "transaction_id",
-        "status",
+        "qandq_id",
+        "description",
     ];
 
     public function user()
@@ -22,8 +20,8 @@ class CoursesPaid extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function coursePaid()
+    public function qandq()
     {
-        return $this->hasMany(CoursePaid::class);
+        return $this->belongsTo(QAndQ::class);
     }
 }
