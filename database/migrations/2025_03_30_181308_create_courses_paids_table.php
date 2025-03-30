@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('courses_paids', function (Blueprint $table) {
             $table->id();
+            $table->foreignId("user_id")->constrained()->onDelete("cascade");
+            $table->decimal("amount_total", 10, 2);
+            $table->string("payment_method");
+            $table->string("transaction_id")->unique();
+            $table->string("status");
             $table->timestamps();
         });
     }

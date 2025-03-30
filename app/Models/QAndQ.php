@@ -9,6 +9,8 @@ class QAndQ extends Model
 {
     use HasFactory;
 
+    protected $table = "q_and_q_s";
+
     protected $fillable = [
         "user_id",
         "course_id",
