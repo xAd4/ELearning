@@ -3,47 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResponseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $responses = Response::all();
+        return response()->json($responses, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validate = $request->validate([
+            "qandq_id" => "required|integer",
+            "description" => "required|string|min:10|",
+        ]);
+
+        $newResponse = Response::create([
+            "qandq_id" => $validate["qandq_id"],
+            "user_id" => $request->user()->id,
+            "description" => $validate["description"],
+        ]);
+
+        return response()->json($newResponse, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Response $response)
+
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        $validate = $request->validate([
+            "qandq_id" => "required|integer",
+            "description" => "required|string|min:10|",
+        ]);
+
+        $response = Response::where('id', $id)
+            ->where('user_id', Auth::user()->id)
+            ->firstOrFail();
+
+        $response->update($validate);
+
+        return response()->json($response, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Response $response)
+    public function destroy(string $id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Response $response)
-    {
-        //
+        $response = Response::where('id', $id)
+            ->where('user_id', Auth::user()->id)
+            ->firstOrFail();
+        $response->delete();
+        return response()->json(null, 204);
     }
 }

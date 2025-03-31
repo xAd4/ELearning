@@ -3,47 +3,70 @@
 namespace App\Http\Controllers;
 
 use App\Models\Content;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ContentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $contents = Content::all();
+        return response()->json($contents, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            "section_id" => "required|integer",
+            "title" => "required|string|min:10|max:255",
+            "file_path" => "required|file|mimes:pdf,mp4,png,jpg,jpeg|mimetypes:application/pdf,video/mp4,image/png,image/jpeg",
+            "order" => "required|integer",
+        ]);
+
+        $newContent = Content::create([
+            "section_id" => $validate["section_id"],
+            "title" => $validate["title"],
+            "file_path" => $validate["file_path"]->store("courses/content", "public"),
+            "order" => $validate["order"],
+        ]);
+
+        return response()->json($newContent, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Content $content)
+    public function show(string $id): JsonResponse
     {
-        //
+        $content = Content::findOrFail($id);
+        return response()->json($content, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Content $content)
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        $content = Content::findOrFail($id);
+
+        $validate = $request->validate([
+            "title" => "sometimes|string|min:3|max:255",
+            "file_path" => "sometimes|file|mimes:pdf,mp4,png,jpg,jpeg",
+            "order" => "sometimes|integer",
+        ]);
+
+        if ($request->hasFile("file_path")) {
+            Storage::disk("public")->delete($content->file_path);
+            $validate["file_path"] = $request->file("file_path")->store("courses/content", "public");
+        } else {
+            unset($validate["file_path"]);
+        }
+
+        $content->update($validate);
+        $content->refresh();
+
+        return response()->json($content, 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Content $content)
+    public function destroy(string $id): JsonResponse
     {
-        //
+        $content = Content::findOrFail($id);
+        $content->delete();
+        return response()->json(null, 204);
     }
 }

@@ -7,43 +7,30 @@ use Illuminate\Http\Request;
 
 class CoursesPaidController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return CoursesPaid::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        return CoursesPaid::create($request->all());
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(CoursesPaid $coursesPaid)
     {
-        //
+        return $coursesPaid->load('coursePaid');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, CoursesPaid $coursesPaid)
     {
-        //
+        $coursesPaid->update($request->all());
+        return $coursesPaid;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(CoursesPaid $coursesPaid)
     {
-        //
+        $coursesPaid->delete();
+        return response()->noContent();
     }
 }

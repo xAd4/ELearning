@@ -3,47 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reviews;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ReviewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $reviews = Reviews::all();
+        return response()->json($reviews, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validate = $request->validate([
+            "course_id" => "required|integer",
+            "rating" => "required|numeric|min:1|max:5",
+            "description" => "required|string|min:10|max:255",
+        ]);
+
+        $newReview = Reviews::create([
+            "course_id" => $validate["course_id"],
+            "user_id" => $request->user()->id,
+            "rating" => $validate["rating"],
+            "description" => $validate["description"],
+        ]);
+
+        return response()->json($newReview, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Reviews $reviews)
+    public function show(string $id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Reviews $reviews)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Reviews $reviews)
-    {
-        //
+        $review = Reviews::findOrFail($id);
+        return response()->json($review, 200);
     }
 }
